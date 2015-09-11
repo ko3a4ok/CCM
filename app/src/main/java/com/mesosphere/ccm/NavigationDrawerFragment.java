@@ -268,7 +268,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private ActionBar getActionBar() {
-        return ((AppCompatActivity) getActivity()).getSupportActionBar();
+        return ((MainActivity) getActivity()).getSupportActionBar();
     }
 
     /**
