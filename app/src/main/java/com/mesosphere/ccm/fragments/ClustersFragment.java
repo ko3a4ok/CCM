@@ -1,22 +1,40 @@
 package com.mesosphere.ccm.fragments;
 
 
-import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
-import com.mesosphere.ccm.MainActivity;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+import com.mesosphere.ccm.CcmJsonArrayRequest;
 import com.mesosphere.ccm.R;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,11 +48,19 @@ public class ClustersFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String api;
     private String mParam2;
 
     private ViewPager pager;
+    android.support.v4.widget.SwipeRefreshLayout refreshLayout;
 
+    List<Map<String, String>> running;
+    List<Map<String, String>> deleted;
+    ListClusters runningFragment;
+    ListClusters deletedFragment;
+
+    private SimpleAdapter runningAdapter;
+    private SimpleAdapter deletedAdapter;
 
     /**
      * Use this factory method to create a new instance of
@@ -61,7 +87,7 @@ public class ClustersFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_API);
+            api = getArguments().getString(ARG_API);
         }
     }
 
@@ -69,10 +95,17 @@ public class ClustersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_clusters, container, false);
-        pager = new ViewPager(getActivity());
-//        pager.setAdapter(new ClustersTabAdapter(getChildFragmentManager()));
+        refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_clusters, container, false);
+        pager = (ViewPager) refreshLayout.findViewById(R.id.pager);
+        pager.setAdapter(new ClustersTabAdapter(getChildFragmentManager()));
         final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        running = new ArrayList();
+        deleted = new ArrayList();
+        runningAdapter = new ClustersAdapter(getActivity(), running);
+        deletedAdapter = new ClustersAdapter(getActivity(), deleted);
+
+        runningFragment = newInstance(0);
+        deletedFragment = newInstance(1);
         pager.setOnPageChangeListener(
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
@@ -105,7 +138,77 @@ public class ClustersFragment extends Fragment {
                             .setText(i == 0 ? R.string.running : R.string.deleted)
                             .setTabListener(tabListener));
         }
-        return pager;
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        refreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout.setRefreshing(true);
+                refresh();
+            }
+        });
+        return refreshLayout;
+    }
+
+    private void refresh() {
+        Volley.newRequestQueue(getActivity()).add(new CcmJsonArrayRequest(api, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                System.err.println("RESPONSE: " + response);
+                running.clear();
+                deleted.clear();
+                int n = response.length();
+                for (int i = 0; i < n; i++){
+                    JSONObject o = response.optJSONObject(i);
+                    Map<String, String> data = parse(o);
+
+                    if (o.optInt("status") == 5)
+                        deleted.add(data);
+                    else
+                        running.add(data);
+                }
+                runningAdapter.notifyDataSetChanged();
+                deletedAdapter.notifyDataSetChanged();
+                refreshLayout.setRefreshing(false);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.err.println("ERROR: " + error);
+                Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_LONG).show();
+                refreshLayout.setRefreshing(false);
+            }
+        }));
+    }
+
+    static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    static SimpleDateFormat OUTPUT = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+    private static Map<String, String> parse(JSONObject o) {
+        Map<String, String> data = new HashMap();
+        data.put(ClustersAdapter.from[0], o.optString("name"));
+        data.put(ClustersAdapter.from[1], o.optString("cluster_desc"));
+        data.put(ClustersAdapter.from[2], o.toString());
+        int status = o.optInt("status");
+        try {
+            data.put(ClustersAdapter.from[3], "Created at: " + OUTPUT.format(SDF.parse(o.optString("created_at"))));
+//            data.put(ClustersAdapter.from[3], "Created at: " + OUTPUT.format());
+            String statusText = o.optString("status_text");
+            if (status == 0) {
+                long left = System.currentTimeMillis() - SDF.parse(o.optString("expired_at")).getTime();
+                left /= 60*1000;
+                if (left > 0)
+                statusText = String.format("Expires in %d hours %d minutes", left/60, left%60);
+            }
+            data.put(ClustersAdapter.from[4], statusText);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return data;
     }
 
 
@@ -117,7 +220,7 @@ public class ClustersFragment extends Fragment {
 
         @Override
         public Fragment getItem(int i) {
-            return PlaceholderFragment.newInstance(i);
+            return i == 0 ? runningFragment : deletedFragment;
         }
 
         @Override
@@ -126,33 +229,40 @@ public class ClustersFragment extends Fragment {
         }
 
     }
+    private static final String ARG_SECTION_NUMBER = "section_number";
+    ListClusters newInstance(int sectionNumber) {
+        ListClusters fragment = new ListClusters();
+        Bundle args = new Bundle();
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
+    class ListClusters extends Fragment {
+        ListClusters() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            int data = getArguments().getInt(ARG_SECTION_NUMBER);
+            final ListView rootView = (ListView) inflater.inflate(R.layout.fragment_main, container, false);
+            rootView.setOnScrollListener(new AbsListView.OnScrollListener()
+            {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState)
+                {
+
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+                {
+                    int topRowVerticalPosition = (rootView == null || rootView.getChildCount() == 0) ? 0 : rootView.getChildAt(0).getTop();
+                    refreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
+                }
+            });
+            rootView.setAdapter(data == 0 ? runningAdapter: deletedAdapter);
             return rootView;
         }
     }

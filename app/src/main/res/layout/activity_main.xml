@@ -21,4 +21,5 @@
         android:layout_gravity="start" android:name="com.mesosphere.ccm.NavigationDrawerFragment"
         tools:layout="@layout/fragment_navigation_drawer" />
 
+
 </android.support.v4.widget.DrawerLayout>

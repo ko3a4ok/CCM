@@ -1,6 +1,9 @@
 package com.mesosphere.ccm;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.graphics.Outline;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -17,13 +20,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.view.ViewOutlineProvider;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.mesosphere.ccm.fragments.ClustersFragment;
 
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
      ActionBarDrawerToggle toggle;
@@ -39,6 +43,7 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
     ClustersFragment myClusters;
     ClustersFragment allClusters;
+    DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,13 +82,13 @@ public class MainActivity extends ActionBarActivity
         Fragment f = null;
         if (position == 0) {
             if (myClusters == null) {
-                myClusters = ClustersFragment.newInstance("");
+                myClusters = ClustersFragment.newInstance(CcmJsonArrayRequest.MY_CLUSTERS);
             }
             f = myClusters;
         }
         if (position == 1) {
             if (allClusters == null) {
-                allClusters = ClustersFragment.newInstance("");
+                allClusters = ClustersFragment.newInstance(CcmJsonArrayRequest.ALL_CLUSTERS);
             }
             f = allClusters;
         }
@@ -104,6 +109,9 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section3);
                 break;
         }
+        if (drawerLayout != null)
+            drawerLayout.closeDrawer(GravityCompat.START);
+        restoreActionBar();
     }
 
     public void restoreActionBar() {
