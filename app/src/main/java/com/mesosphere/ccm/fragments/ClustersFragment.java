@@ -27,6 +27,7 @@ import com.android.volley.toolbox.Volley;
 import com.melnykov.fab.FloatingActionButton;
 import com.mesosphere.ccm.CcmJsonArrayRequest;
 import com.mesosphere.ccm.ClusterDetailActivity;
+import com.mesosphere.ccm.CustomSwipeRefreshLayout;
 import com.mesosphere.ccm.MainActivity;
 import com.mesosphere.ccm.R;
 
@@ -58,7 +59,7 @@ public class ClustersFragment extends Fragment {
     private String mParam2;
 
     private ViewPager pager;
-    android.support.v4.widget.SwipeRefreshLayout refreshLayout;
+    CustomSwipeRefreshLayout refreshLayout;
 
     List<Map<String, String>> running;
     List<Map<String, String>> deleted;
@@ -101,7 +102,7 @@ public class ClustersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_clusters, container, false);
+        refreshLayout = (CustomSwipeRefreshLayout) inflater.inflate(R.layout.fragment_clusters, container, false);
         pager = (ViewPager) refreshLayout.findViewById(R.id.pager);
         pager.setAdapter(new ClustersTabAdapter(getChildFragmentManager()));
         final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -252,19 +253,12 @@ public class ClustersFragment extends Fragment {
                                  Bundle savedInstanceState) {
             int data = getArguments().getInt(ARG_SECTION_NUMBER);
             final ListView rootView = (ListView) inflater.inflate(R.layout.fragment_main, container, false);
-            rootView.setOnScrollListener(new AbsListView.OnScrollListener()
-            {
+            refreshLayout.setOnChildScrollUpListener(new CustomSwipeRefreshLayout.OnChildScrollUpListener() {
                 @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState)
-                {
-
-                }
-
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-                {
-                    int topRowVerticalPosition = (rootView == null || rootView.getChildCount() == 0) ? 0 : rootView.getChildAt(0).getTop();
-                    refreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
+                public boolean canChildScrollUp() {
+                    return rootView.getFirstVisiblePosition() > 0 ||
+                            rootView.getChildAt(0) == null ||
+                            rootView.getChildAt(0).getTop() < 0;
                 }
             });
             rootView.setAdapter(data == 0 ? runningAdapter : deletedAdapter);
