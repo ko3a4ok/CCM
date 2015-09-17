@@ -22,6 +22,10 @@
             android:name=".CreateNewClusterActivity"
             android:label="@string/title_activity_create_new_cluster" >
         </activity>
+        <activity
+            android:name=".ClusterDetailActivity"
+            android:label="@string/title_activity_cluster_detail" >
+        </activity>
     </application>
 
 </manifest>

@@ -53,5 +53,8 @@
         <item>single-master.cloudformation.json</item>
         <item>multi-master.cloudformation.json</item>
     </string-array>
+    <string name="title_activity_cluster_detail">Cluster Details</string>
+    <string name="detele">Delete Cluster</string>
+    <string name="extend">Extend Cluster</string>
 
 </resources>

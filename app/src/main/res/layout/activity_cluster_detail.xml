@@ -1,0 +1,79 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:padding="15dp"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_name"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_created_at"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_region"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_marginBottom="10dp"
+            android:id="@+id/cluster_cost"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <Button
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:background="#2c699e"
+            android:layout_weight="1"
+            android:onClick="onExtendCluster"
+            android:layout_marginTop="10dp"
+            android:text="@string/extend"
+            android:layout_width="fill_parent"
+            android:layout_marginRight="5dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:background="#fd413d"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:onClick="onDeleteCluster"
+            android:layout_marginTop="10dp"
+            android:text="@string/detele"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

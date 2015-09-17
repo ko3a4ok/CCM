@@ -1,6 +1,7 @@
 package com.mesosphere.ccm.fragments;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -24,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.melnykov.fab.FloatingActionButton;
 import com.mesosphere.ccm.CcmJsonArrayRequest;
+import com.mesosphere.ccm.ClusterDetailActivity;
 import com.mesosphere.ccm.MainActivity;
 import com.mesosphere.ccm.R;
 
@@ -33,6 +36,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -187,8 +191,8 @@ public class ClustersFragment extends Fragment {
         }));
     }
 
-    static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static SimpleDateFormat OUTPUT = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+    public static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static SimpleDateFormat OUTPUT = new SimpleDateFormat("HH:mm dd/MM/yyyy");
     private static Map<String, String> parse(JSONObject o) {
         Map<String, String> data = new HashMap();
         data.put(ClustersAdapter.from[0], o.optString("name"));
@@ -197,10 +201,9 @@ public class ClustersFragment extends Fragment {
         int status = o.optInt("status");
         try {
             data.put(ClustersAdapter.from[3], "Created at: " + OUTPUT.format(SDF.parse(o.optString("created_at"))));
-//            data.put(ClustersAdapter.from[3], "Created at: " + OUTPUT.format());
             String statusText = o.optString("status_text");
             if (status == 0) {
-                long left = System.currentTimeMillis() - SDF.parse(o.optString("expired_at")).getTime();
+                long left = SDF.parse(o.optString("expired_at")).getTime() - System.currentTimeMillis() +  1000*60*60*3;
                 left /= 60*1000;
                 if (left > 0)
                 statusText = String.format("Expires in %d hours %d minutes", left/60, left%60);
@@ -266,6 +269,15 @@ public class ClustersFragment extends Fragment {
             });
             rootView.setAdapter(data == 0 ? runningAdapter : deletedAdapter);
             ((FloatingActionButton)(getActivity()).findViewById(R.id.fab)).attachToListView(rootView);
+            rootView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    System.err.println("Click >>> " + rootView.getAdapter().getItem(i));
+                    Intent intent = new Intent(getActivity(), ClusterDetailActivity.class);
+                    intent.putExtra("data", (String)((Map)rootView.getAdapter().getItem(i)).get("data"));
+                    startActivity(intent);
+                }
+            });
             return rootView;
         }
     }
