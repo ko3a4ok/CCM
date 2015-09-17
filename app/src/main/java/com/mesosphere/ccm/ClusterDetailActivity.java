@@ -2,6 +2,7 @@ package com.mesosphere.ccm;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,11 +10,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mesosphere.ccm.fragments.ClustersFragment.*;
 
@@ -97,6 +113,45 @@ public class ClusterDetailActivity extends ActionBarActivity {
     }
 
     public void onDeleteCluster(View v) {
+        final String urlString = CcmJsonArrayRequest.HOST + CcmJsonArrayRequest.MY_CLUSTERS + clusterId + "/";
+        try {
+            showDialog(DIALOG_LOADING);
+            new AsyncTask<Void, Void, Integer>(){
+
+                @Override
+                protected Integer doInBackground(Void... voids) {
+                    try {
+                        URL url = new URL(urlString);
+                        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+                        httpCon.setRequestProperty(
+                                "Authorization", "Token " + Props.TOKEN);
+                        httpCon.setRequestMethod("DELETE");
+                        return httpCon.getResponseCode();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Integer code) {
+                    System.err.println("RESPONSE CODE: " + code);
+                    dismissDialog(DIALOG_LOADING);
+                    if (code != null && code < 400) {
+                        Toast.makeText(ClusterDetailActivity.this, R.string.delete_successful, Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        Toast.makeText(ClusterDetailActivity.this, R.string.delete_error, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }.execute();
+
+
+        } catch (Exception uee) {
+            Toast.makeText(this, R.string.delete_error, Toast.LENGTH_LONG).show();
+            uee.printStackTrace();
+        }
 
     }
 

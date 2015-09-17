@@ -21,7 +21,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="create_error">Could not create cluster now.</string>
+    <string name="delete_error">Could not delete cluster now.</string>
     <string name="create_successful">Cluster has created successful</string>
+    <string name="delete_successful">Cluster is deleting</string>
     <string name="loading">Loading. Please wait</string>
     <string-array name="providers">
         <item>AWS</item>
