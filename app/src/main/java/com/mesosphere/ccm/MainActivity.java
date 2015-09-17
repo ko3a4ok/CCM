@@ -2,6 +2,7 @@ package com.mesosphere.ccm;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Outline;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -151,6 +152,10 @@ public class MainActivity extends AppCompatActivity
             return true;
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onCreateCluster(View v) {
+        startActivity(new Intent(this, CreateNewClusterActivity.class));
     }
 
 }

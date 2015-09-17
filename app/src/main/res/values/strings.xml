@@ -17,4 +17,41 @@
     <string name="running">Active</string>
     <string name="deleted">Deleted</string>
     <string name="error">Could load clusters now. Please try again later</string>
+    <string name="title_activity_create_new_cluster">Create New Cluster</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="create_error">Could not create cluster now.</string>
+    <string name="create_successful">Cluster has created successful</string>
+    <string name="loading">Loading. Please wait</string>
+    <string-array name="providers">
+        <item>AWS</item>
+        <item>Azure</item>
+        <item>GCE</item>
+    </string-array>
+
+    <string-array name="regions">
+        <item>us-east-1</item>
+        <item>us-west-1</item>
+        <item>us-west-2</item>
+        <item>eu-west-1</item>
+        <item>eu-central-1</item>
+        <item>ap-northeast-1</item>
+        <item>ap-southeast-1</item>
+        <item>ap-southeast-2</item>
+        <item>sa-east-1</item>
+    </string-array>
+
+    <string-array name="duration">
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>4 hours</item>
+        <item>8 hours</item>
+        <item>12 hours</item>
+    </string-array>
+
+    <string-array name="template">
+        <item>single-master.cloudformation.json</item>
+        <item>multi-master.cloudformation.json</item>
+    </string-array>
+
 </resources>

@@ -22,7 +22,9 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.melnykov.fab.FloatingActionButton;
 import com.mesosphere.ccm.CcmJsonArrayRequest;
+import com.mesosphere.ccm.MainActivity;
 import com.mesosphere.ccm.R;
 
 import org.json.JSONArray;
@@ -262,7 +264,8 @@ public class ClustersFragment extends Fragment {
                     refreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
                 }
             });
-            rootView.setAdapter(data == 0 ? runningAdapter: deletedAdapter);
+            rootView.setAdapter(data == 0 ? runningAdapter : deletedAdapter);
+            ((FloatingActionButton)(getActivity()).findViewById(R.id.fab)).attachToListView(rootView);
             return rootView;
         }
     }

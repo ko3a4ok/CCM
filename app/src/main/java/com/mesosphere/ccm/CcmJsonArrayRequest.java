@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by ko3a4ok on 17.09.15.
  */
 public class CcmJsonArrayRequest extends JsonArrayRequest {
-    private final static String HOST = "http://ccm.mesosphere.com";
+    public final static String HOST = "http://ccm.mesosphere.com";
 //    private final static String HOST = "http://10.2.2.71:8000";
     public final static String MY_CLUSTERS = "/api/cluster/";
     public final static String ALL_CLUSTERS = "/api/provider_cluster/0/";
