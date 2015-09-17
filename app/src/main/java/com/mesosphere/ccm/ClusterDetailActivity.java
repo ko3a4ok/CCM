@@ -53,6 +53,7 @@ public class ClusterDetailActivity extends ActionBarActivity {
             ((TextView)findViewById(R.id.cluster_status)).setText(o.optString("status_text"));
             ((TextView)findViewById(R.id.cluster_cost)).setText(String.format("Cluster cost/hour: $%.2f", o.optDouble("cluster_cost")));
             ((TextView)findViewById(R.id.cluster_region)).setText("Region: " + o.optString("region"));
+            ((TextView)findViewById(R.id.cluster_user)).setText("Created by: " + o.optString("user"));
             try {
                 ((TextView)findViewById(R.id.cluster_created_at)).setText("Created at: " + OUTPUT.format(SDF.parse(o.optString("created_at"))));
                 if (o.optInt("status") == 0) {
