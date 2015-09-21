@@ -17,6 +17,7 @@ public class CcmJsonArrayRequest extends JsonArrayRequest {
 //    private final static String HOST = "http://10.2.2.71:8000";
     public final static String MY_CLUSTERS = "/api/cluster/";
     public final static String ALL_CLUSTERS = "/api/provider_cluster/0/";
+    public final static String LOGS = "/api/logs/";
 
     public CcmJsonArrayRequest(String path, Response.Listener<JSONArray> listener, Response.ErrorListener errorListener) {
         super(HOST + path, listener, errorListener);

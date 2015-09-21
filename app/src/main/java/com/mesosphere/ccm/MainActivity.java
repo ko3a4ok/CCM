@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.mesosphere.ccm.fragments.ClustersFragment;
+import com.mesosphere.ccm.fragments.LogsFragment;
 
 
 public class MainActivity extends AppCompatActivity
@@ -44,12 +45,13 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
     ClustersFragment myClusters;
     ClustersFragment allClusters;
+    Fragment logs;
     DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
@@ -92,6 +94,12 @@ public class MainActivity extends AppCompatActivity
                 allClusters = ClustersFragment.newInstance(CcmJsonArrayRequest.ALL_CLUSTERS);
             }
             f = allClusters;
+        }
+        if (position == 2) {
+            if (logs == null) {
+                logs = LogsFragment.newInstance(null, null);
+            }
+            f = logs;
         }
         fragmentManager.beginTransaction().replace(R.id.container, f).commit();
         onSectionAttached(position);
